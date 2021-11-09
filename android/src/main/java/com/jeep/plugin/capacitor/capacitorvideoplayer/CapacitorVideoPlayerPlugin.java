@@ -107,6 +107,10 @@ public class CapacitorVideoPlayerPlugin extends Plugin {
             if (call.getData().has("hideCloseButton")) {
                 hideCloseButton = call.getBoolean("hideCloseButton", false);
             }
+            Boolean disableSeeking = false;
+            if (call.getData().has("disableSeeking")) {
+                disableSeeking = call.getBoolean("disableSeeking", false);
+            }
 
             AddObserversToNotificationCenter();
             Log.v(TAG, "display url: " + url);
@@ -126,7 +130,7 @@ public class CapacitorVideoPlayerPlugin extends Plugin {
                 Log.v(TAG, "*** calculated videoPath: " + videoPath);
                 Log.v(TAG, "*** calculated subTitlePath: " + subTitlePath);
                 if (videoPath != null) {
-                    createFullScreenFragment(call, videoPath, subTitlePath, language, subTitleOptions, isTV, playerId, false, null, hideCloseButton);
+                    createFullScreenFragment(call, videoPath, subTitlePath, language, subTitleOptions, isTV, playerId, false, null, hideCloseButton, disableSeeking);
                 } else {
                     Map<String, Object> info = new HashMap<String, Object>() {
                         {
@@ -676,7 +680,7 @@ public class CapacitorVideoPlayerPlugin extends Plugin {
                         }
                         pkFragment = null;
                         if (videoId != -1) {
-                            createFullScreenFragment(call, videoPath, null, null, null, isTV, fsPlayerId, true, videoId, false);
+                            createFullScreenFragment(call, videoPath, null, null, null, isTV, fsPlayerId, true, videoId, false, false);
                         } else {
                             Toast.makeText(context, "No Video files found ", Toast.LENGTH_SHORT).show();
                             Map<String, Object> info = new HashMap<String, Object>() {
@@ -701,10 +705,11 @@ public class CapacitorVideoPlayerPlugin extends Plugin {
         String playerId,
         Boolean isInternal,
         Long videoId,
-        Boolean hideCloseButton
+        Boolean hideCloseButton,
+        Boolean disableSeeking
     ) {
         fsFragment =
-            implementation.createFullScreenFragment(videoPath, subTitle, language, subTitleOptions, isTV, playerId, isInternal, videoId, hideCloseButton);
+            implementation.createFullScreenFragment(videoPath, subTitle, language, subTitleOptions, isTV, playerId, isInternal, videoId, hideCloseButton, disableSeeking);
         bridge
             .getActivity()
             .runOnUiThread(
