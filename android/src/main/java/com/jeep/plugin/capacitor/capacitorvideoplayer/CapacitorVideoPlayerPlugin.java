@@ -416,7 +416,7 @@ public class CapacitorVideoPlayerPlugin extends Plugin {
             call.resolve(ret);
             return;
         }
-        String value = call.getString("volume");
+        Float value = call.getFloat("volume");
         if (value == null) {
             ret.put("result", false);
             ret.put("method", "setVolume");
@@ -424,7 +424,6 @@ public class CapacitorVideoPlayerPlugin extends Plugin {
             call.resolve(ret);
             return;
         }
-        final Float volume = Float.valueOf(value.trim());
         if ("fullscreen".equals(mode) && fsPlayerId.equals(playerId)) {
             bridge
                 .getActivity()
@@ -432,12 +431,14 @@ public class CapacitorVideoPlayerPlugin extends Plugin {
                     new Runnable() {
                         @Override
                         public void run() {
-                            fsFragment.setVolume(volume);
-                            JSObject ret = new JSObject();
-                            ret.put("result", true);
-                            ret.put("method", "setVolume");
-                            ret.put("value", volume);
-                            call.resolve(ret);
+                            if (fsFragment != null) {
+                                fsFragment.setVolume(value);
+                                JSObject ret = new JSObject();
+                                ret.put("result", true);
+                                ret.put("method", "setVolume");
+                                ret.put("value", value);
+                                call.resolve(ret);
+                            }
                         }
                     }
                 );
