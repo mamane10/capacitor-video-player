@@ -192,7 +192,7 @@ public class FullscreenExoPlayerFragment extends Fragment {
                                 new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {
-                                        backPressed();
+                                        closePlayer();
                                     }
                                 }
                             );
@@ -251,6 +251,27 @@ public class FullscreenExoPlayerFragment extends Fragment {
      * Perform backPressed Action
      */
     private void backPressed() {
+        if (hideCloseButton) {
+            reducePlayer();
+        } else {
+            closePlayer();
+        }
+    }
+
+    public void reducePlayer() {
+        pause();
+        view.setVisibility(View.GONE);
+    }
+
+    public void expandPlayer() {
+        view.setVisibility(View.VISIBLE);
+        view.setFocusableInTouchMode(true);
+        view.requestFocus();
+        view.requestFocusFromTouch();
+        play();
+    }
+
+    public void closePlayer() {
         Map<String, Object> info = new HashMap<String, Object>() {
             {
                 put("dismiss", "1");
@@ -259,7 +280,10 @@ public class FullscreenExoPlayerFragment extends Fragment {
         player.seekTo(0);
         player.setVolume(curVolume);
         releasePlayer();
-        NotificationCenter.defaultCenter().postNotification("playerFullscreenDismiss", info);
+        try {
+            NotificationCenter.defaultCenter().postNotification("playerFullscreenDismiss", info);
+        } catch (Exception ignore){}
+
     }
 
     /**
@@ -346,8 +370,10 @@ public class FullscreenExoPlayerFragment extends Fragment {
      * Leave the fullsreen mode and reset the status bar to visible
      */
     private void showSystemUI() {
-        getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        getActivity().getWindow().getDecorView().setSystemUiVisibility(View.VISIBLE);
+        if (getActivity() != null) {
+            getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            getActivity().getWindow().getDecorView().setSystemUiVisibility(View.VISIBLE);
+        }
     }
 
     /**
@@ -681,6 +707,15 @@ public class FullscreenExoPlayerFragment extends Fragment {
     }
 
     /**
+     * unload the player
+     */
+    public void unload() {
+        if (player != null) {
+            closePlayer();
+        }
+    }
+
+    /**
      * Player Event Listener
      */
     private class PlaybackStateListener implements Player.EventListener {
@@ -707,6 +742,9 @@ public class FullscreenExoPlayerFragment extends Fragment {
                     Pbar.setVisibility(View.GONE);
                     Log.v(TAG, "**** in ExoPlayer.STATE_READY firstReadyToPlay " + firstReadyToPlay);
 
+                    if (view.getVisibility() != View.VISIBLE) {
+                        expandPlayer();
+                    }
                     if (firstReadyToPlay) {
                         firstReadyToPlay = false;
                         NotificationCenter.defaultCenter().postNotification("playerItemReady", info);

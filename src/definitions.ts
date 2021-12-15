@@ -66,6 +66,16 @@ export interface CapacitorVideoPlayerPlugin {
    *
    */
   stopAllPlayers(): Promise<capVideoPlayerResult>;
+    /**
+     * Unload player
+     *
+     */
+    unloadPlayer(options: capVideoPlayerIdOptions): Promise<capVideoPlayerResult>;
+    /**
+     * Expand player
+     *
+     */
+    expandPlayer(options: capVideoPlayerIdOptions): Promise<capVideoPlayerResult>;
 }
 export interface capEchoOptions {
   /**
