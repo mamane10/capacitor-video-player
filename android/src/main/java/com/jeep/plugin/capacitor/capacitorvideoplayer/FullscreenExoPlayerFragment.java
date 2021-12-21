@@ -275,6 +275,7 @@ public class FullscreenExoPlayerFragment extends Fragment {
         Map<String, Object> info = new HashMap<String, Object>() {
             {
                 put("dismiss", "1");
+                put("currentTime", String.valueOf(player.getCurrentPosition() / 1000));
             }
         };
         player.seekTo(0);
